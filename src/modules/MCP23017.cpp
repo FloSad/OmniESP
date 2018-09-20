@@ -85,7 +85,7 @@ void MCP23017::irqHandle() {
     logging.debug("mcpGPIO " + String(pin) + " | " + String(val));
     topicQueue.put(eventPrefix + "/" + String(pin) + " " + String(val));
 
-    clearIRQ();
+    //clearIRQ();
 
 
     while (Wire.i2c.read8_8(MCP23017_INTFA) > 0 || Wire.i2c.read8_8(MCP23017_INTFB) > 0){

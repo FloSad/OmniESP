@@ -75,11 +75,6 @@ String LCD::getVersion() {
 //  printline
 //...............................................................................
 void LCD::println(String txt, int yPos) {
-
-
-
-
-
   ssd1306_printFixed(0,  yPos, txt.c_str(), STYLE_NORMAL);
 
 

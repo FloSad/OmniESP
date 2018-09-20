@@ -469,7 +469,7 @@ void Controller::t_1s_Update() {
 }
 
 void Controller::t_short_Update() {
-  //topicQueue.put("~/event/timer/shortUpdate");
+  topicQueue.put("~/event/timer/shortUpdate");
   /*
     espTools.debugMem();
   */
