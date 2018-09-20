@@ -8,10 +8,15 @@
 //-------------------------------------------------------------------------------
 //  constructor
 //-------------------------------------------------------------------------------
+//  mcpGPIO("MCP23017", logging, topicQueue, MCPIRQ, SDA, SCL),
+//  Drawer_01("ws2812", logging, topicQueue, PIN_WS2812, LEDSCOUNT),
+//  lcd("SSD1306", logging, topicQueue, SDA, SCL)
 customDevice::customDevice(LOGGING &logging, TopicQueue &topicQueue, FFS &ffs)
     : Device(logging, topicQueue, ffs),
-      mcpGPIO("MCP23017", logging, topicQueue, MCPIRQ, SDA, SCL),
+      //mcpGPIO("MCP23017", logging, topicQueue, MCPIRQ, SDA, SCL),
       Drawer_01("ws2812", logging, topicQueue, PIN_WS2812, LEDSCOUNT)
+      //lcd("SSD1306", logging, topicQueue, SDA, SCL)
+
  {
 
   type = String(DEVICETYPE);
@@ -26,10 +31,17 @@ void customDevice::start() {
 
   Device::start(); // mandatory
 
-  Wire.i2c.scanBus();
-  mcpGPIO.start();
-  configMCP();
+  logging.info("scanning I2C-Bus for devices");
+  logging.info(Wire.i2c.scanBus());
+
+  //mcpGPIO.start();
+  //configMCP();
+
   Drawer_01.start();
+
+//  lcd.start();
+
+
 
   // ... your code here ...
   configItem = ffs.deviceCFG.readItem("configItem").toInt();
@@ -55,7 +67,8 @@ void customDevice::inform() {
 //...............................................................................
 
 void customDevice::handle() {
-  mcpGPIO.handle();
+//  mcpGPIO.handle();
+//  lcd.handle();
 
   unsigned long now = millis();
   if (now - lastPoll >= 3000) {
@@ -117,19 +130,31 @@ void customDevice::on_events(Topic &topic) {
   // central business logic
   //Serial.println("customDevice::on_events | " + topic.modifyTopic(1));
 
+  //7if (topic.modifyTopic(0) == "event/device/Sensor_02/temperature"){
+  if (topic.itemIs(2, "device")) {
+    if (topic.itemIs(3, "Sensor_01")){
+      //Serial.println("Sensor01");
+    }
+    if (topic.itemIs(3, "Sensor_02")){
+      //Serial.println("Sensor02");
+    }
+  }
+  //}
+
+
   //5s Timer
   if (topic.modifyTopic(0) == "event/timer/shortUpdate") {
     //Serial.println("customDevice::on_events | ~/event/timer/longUpdate");
-    readBMP180("Sensor_01");
+  //  readBMP180("Sensor_01");
     readSi7021("Sensor_02");
   }
 
   if (topic.modifyTopic(0) == "event/timer/1sUpdate"){
     //lcd.println(WiFi.localIP().toString(), 0);
     //logging.error("WiFi is connected");
-    mcpGPIO.mcp.digitalWrite(8, true);
-    delay(100);
-    mcpGPIO.mcp.digitalWrite(8, false);
+    //mcpGPIO.mcp.digitalWrite(8, true);
+    //delay(100);
+    //mcpGPIO.mcp.digitalWrite(8, false);
 
     //Drawer_01.WS2812_setColor(R,G,B);
     R += 10;
@@ -160,6 +185,7 @@ void customDevice::on_events(Topic &topic) {
 //-------------------------------------------------------------------------------
 //  Device private
 //-------------------------------------------------------------------------------
+/*
 //...............................................................................
 // config MCP23017
 //...............................................................................
@@ -173,7 +199,7 @@ void customDevice::configMCP() {
   mcpGPIO.mcp.writeRegister(MCP23017_IPOLA, B11111111);
   //mcpGPIO.mcp.writeRegister(MCP23017_IPOLB, B11111111);
   // GPINTENx [RW] Interrupt-On-Change-Funktion
-  // 1 = IRQ enabled; 0 = IRQ disabled
+  // 1 = IRQ enabled; 0 = IRQ disa2bled
   // Es müssen zusätzlich die DEFVAL- und INTCON-Register konfiguriert werden.
   mcpGPIO.mcp.writeRegister(MCP23017_GPINTENA, B11111111);
   //mcpGPIO.mcp.writeRegister(MCP23017_GPINTENB, B11111111);
@@ -201,8 +227,8 @@ void customDevice::configMCP() {
   //                           allways 0     ────────┘
 }
 
-
-
+*/
+/*
 //...............................................................................
 // read BMP180
 //...............................................................................
@@ -218,20 +244,26 @@ void customDevice::readBMP180(String name) {
    value = "pressure " + pressure;
    //logging.debug(value);
    topicQueue.put(eventPrefix + "/" + value);
-}
 
+}
+*/
 //...............................................................................
 // read SI7021
 //...............................................................................
 void customDevice::readSi7021(String name) {
-   Adafruit_Si7021 si;
+  Adafruit_Si7021 si;
    String eventPrefix= "~/event/device/" + name + "/";
-
    si.begin();
-   String value = "temperature " + String(si.readTemperature());
-   //logging.debug(value);
-   topicQueue.put(eventPrefix + "/" + value);
-   value = "humidity " + String(si.readHumidity());
-   //logging.debug(value);
-   topicQueue.put(eventPrefix + "/" + value);
+
+
+  logging.debug(String(si.readTemperature()));
+   String value1 = "temperature " + String(si.readTemperature());
+   logging.debug(value1);
+   topicQueue.put(eventPrefix + "/" + value1);
+   String value2 = "humidity " + String(si.readHumidity());
+   logging.debug(value2);
+   topicQueue.put(eventPrefix + "/" + value2);
+   //ssd1306_clearScreen();
+   //
+   //lcd.println(value2, 30);
 }

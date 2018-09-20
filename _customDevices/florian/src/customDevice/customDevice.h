@@ -15,7 +15,7 @@
 #include "modules/MCP23017.h"
 #include "modules/WS2812.h"
 
-
+#include "modules/LCD.h"
 //###############################################################################
 //  Device
 //###############################################################################
@@ -36,19 +36,20 @@ public:
   void on_events(Topic &topic);
 
 private:
-  void readBMP180(String name);
+//  void readBMP180(String name);
   void readSi7021(String name);
   String pressure;
 
-  MCP23017 mcpGPIO;
-  void configMCP();
+//  MCP23017 mcpGPIO;
+//  void configMCP();
+
   WS2812 Drawer_01;
   uint8_t R = 0;
   uint8_t G = 0;
   uint8_t B = 0;
   uint32_t color = 0;
 
-
+//  LCD lcd;
 
 
   // ...your sensor objects, modules, functions here...
