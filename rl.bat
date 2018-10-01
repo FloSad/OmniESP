@@ -143,8 +143,6 @@ REM ----------------------------------------------------------------------------
   REM -----------------------------------------
   ECHO clean archive files !deviceDir[%dirCounter%]!....
   DEL _customDevices\!deviceDir[%dirCounter%]!\data\customDevice\*.json
-  DEL _customDevices\!deviceDir[%dirCounter%]!\firmware\*.bin
-  DEL _customDevices\!deviceDir[%dirCounter%]!\firmware\*.tar
   DEL _customDevices\!deviceDir[%dirCounter%]!\src\customDevice\customDevice*.*
   ECHO done
   ECHO.
@@ -155,7 +153,6 @@ REM ----------------------------------------------------------------------------
 
   ECHO archive files to !deviceDir[%dirCounter%]!
   XCOPY data\customDevice\*.json _customDevices\!deviceDir[%dirCounter%]!\data\customDevice\ /S /Y
-  XCOPY update\*.* _customDevices\!deviceDir[%dirCounter%]!\firmware\ /S /Y
   XCOPY src\customDevice\customDevice*.* _customDevices\!deviceDir[%dirCounter%]!\src\customDevice\ /S /Y
   ECHO done
   ECHO.

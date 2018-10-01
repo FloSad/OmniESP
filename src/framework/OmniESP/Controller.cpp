@@ -162,19 +162,20 @@ void Controller::handleEvent(String &topicsArgs) {
 //  EVENT Wifi has connected
 //...............................................................................
 void Controller::on_wl_connected() {
+  on_wifi_state_change();
   logging.info("WiFi STA has connected");
   topicQueue.put("~/event/wifi/wl_connected");
   logging.info("STA connected to " + WiFi.SSID() + " | IP "
                                    + WiFi.localIP().toString());
 
   startNtp();
-  //topicQueue.put("~/set/mqtt/state", 1);
   on_netConnected();
 }
 //...............................................................................
 //  EVENT wifi has disconnected
 //...............................................................................
 void Controller::on_wl_connect_failed() {
+  on_wifi_state_change();
   logging.info("WiFi STA has failed to connect");
   topicQueue.put("~/event/wifi/wl_connect_failed");
   on_netDisconnected();
@@ -183,6 +184,7 @@ void Controller::on_wl_connect_failed() {
 //  EVENT wifi no SSID avail
 //...............................................................................
 void Controller::on_wl_no_ssid_avail() {
+  on_wifi_state_change();
   logging.info("WiFi STA SSID is not avail");
   topicQueue.put("~/event/wifi/no_ssid_avail");
   on_netDisconnected();
@@ -192,16 +194,17 @@ void Controller::on_wl_no_ssid_avail() {
 //  EVENT AP has connected with stations
 //...............................................................................
 void Controller::on_ap_stations_connected() {
+  on_wifi_state_change();
   logging.info("WiFi AP open with connected stations");
   topicQueue.put("~/event/wifi/ap_stations_connected");
-  //on_netConnected();
 }
 //...............................................................................
 //  EVENT AP has opened without stations
 //...............................................................................
 void Controller::on_ap_no_stations_connected() {
+  on_wifi_state_change();
   logging.info("WiFi AP open without connected stations");
-  topicQueue.put("~/event/wifi/on_ap_no_stations_connected");
+  topicQueue.put("~/event/wifi/ap_no_stations_connected");
 
   //is this the right place?
   staState = STA_DISCONNECTED;
@@ -460,7 +463,7 @@ String Controller::call(Topic &topic) {
 //...............................................................................
 void Controller::t_1s_Update() {
   //Check MQTT state and try reconnect if necessary
-  if (netState == NET_CONNECTED and mqtt_state == 0){
+  if (netState == NET_CONNECTED and mqtt_state == 0 and ffs.cfg.readItem("mqtt") == "on"){
     logging.debug("MQTT try reconnect");
     topicQueue.put("~/event/mqtt/reconnect");
   }
