@@ -16,6 +16,9 @@
 //#include "modules/WS2812.h"
 #include "Adafruit_BMP085.h"
 #include "Adafruit_Si7021.h"
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BMP280.h>
+#include <Adafruit_BME280.h>
 
 //###############################################################################
 //  Device
@@ -35,6 +38,9 @@ public:
 
 private:
   LCD lcd;
+  Adafruit_BME280 bme280; // I2C
+  String timeStr;
+
   //OW ow;
   //MCP23017 mcpGPIO;
   //void configMCP();
@@ -42,6 +48,7 @@ private:
   int sensorPollTime;
   unsigned long lastPoll = 0;
   void readBMP180(String name);
+  void readBME280(String name);
   void readSi7021(String name);
 
 };

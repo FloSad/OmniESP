@@ -29,17 +29,19 @@ void customDevice::start() {
   logging.info("starting " + lcd.getVersion()); //only first time a class is started
   lcd.start();
 
+
   //logging.info("starting " + ow.getVersion()); //only first time a class is started
   //ow.start();
-  logging.info("starting " + mcpGPIO.getVersion()); //only first time a class is started
+  //logging.info("starting " + mcpGPIO.getVersion()); //only first time a class is started
   //mcpGPIO.start();
   //configMCP();
 
   logging.info("device running");
-  logging.info(ffs.deviceCFG.readItem("NEW"));
 
   logging.info("scanning I2C-Bus for devices");
   logging.info(Wire.i2c.scanBus());
+
+
 
   //Wire.i2c.testI2C();
 }
@@ -50,14 +52,15 @@ void customDevice::start() {
 void customDevice::handle() {
   unsigned long now = millis();
 
-  lcd.handle();
+  //lcd.handle();
   //ow.handle();
   //mcpGPIO.handle();
 
   if (now - lastPoll > sensorPollTime){
     lastPoll = now;
-    readBMP180("sensor1");
-    readSi7021("sensor2");
+    //readBMP180("sensor1");
+    readBME280("sensor1");
+    //readSi7021("sensor2");
   }
 }
 
@@ -118,6 +121,12 @@ void customDevice::on_events(Topic &topic) {
     //lcd.println(WiFi.localIP().toString(), 0);
     //mcpGPIO.mcp.digitalWrite(8, true);
   }
+  if (topic.modifyTopic(0) == "event/clock/time"){
+    timeStr = topic.arg_asString();
+    //mcpGPIO.mcp.digitalWrite(8, true);
+  }
+
+
 
 /*
 //button
@@ -207,6 +216,41 @@ void customDevice::readBMP180(String name) {
    topicQueue.put(eventPrefix + "/" + value);
 }
 
+//...............................................................................
+// read BMP180
+//...............................................................................
+void customDevice::readBME280(String name) {
+  bme280.begin(0x76);
+  //delay(100);
+  lcd.display.clear();
+
+   String eventPrefix= "~/event/device/" + name + "/";
+
+   String value =  String(bme280.readTemperature());
+   //logging.debug(value);
+   topicQueue.put(eventPrefix + "/" + "temperature " + value);
+   lcd.println("Temperature: " + value + "°C", 0);
+
+   value = String(bme280.readPressure()/100);
+   //logging.debug(value);
+   topicQueue.put(eventPrefix + "/" + "pressure " + value);
+   lcd.println("Pressure:    " + value + "hPa", 10);
+
+   value = String(bme280.readAltitude(1013.25));
+   //logging.debug(value);
+   topicQueue.put(eventPrefix + "/" + "altitude " + value);
+   lcd.println("Altitude:    " + value + "m", 20);
+
+   value = String(bme280.readHumidity());
+   //logging.debug(value);
+   topicQueue.put(eventPrefix + "/" + "humidity " + value);
+   lcd.println("Humidity:    " + value + "%", 30);
+   lcd.println(timeStr, 50);
+
+   lcd.display.display();
+
+
+}
 //...............................................................................
 // read SI7021
 //...............................................................................

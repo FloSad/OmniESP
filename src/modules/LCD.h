@@ -3,8 +3,9 @@
 #include "framework/Utils/Logger.h"
 #include "Setup.h"
 #include "framework/OmniESP/Topic.h"
-#include <ssd1306.h>
+#include "SSD1306Wire.h"
 #include <Wire.h> //I²C
+#include "images.h"
 
 //###############################################################################
 //  LCD
@@ -30,6 +31,13 @@ public:
 
   void println(String txt, int yPos);
 
+  SSD1306Wire display;
+
 private:
-  //SSD1306 ssd1306;
+  #define DEMO_DURATION 3000
+  typedef void (*Demo)(void);
+
+  int demoMode = 0;
+  int counter = 1;
+
 };

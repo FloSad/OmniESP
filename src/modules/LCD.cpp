@@ -6,7 +6,8 @@
 //===============================================================================
 LCD::LCD(string name, LOGGING &logging, TopicQueue &topicQueue, int sda, int scl)
         :Module(name, logging, topicQueue),
-         sda(sda), scl(scl)//,
+         sda(sda), scl(scl),
+         display(0x3c, sda, scl)
          //ssd1306(SSD1306_I2C_adr, sda, scl)
          {}
 
@@ -19,11 +20,18 @@ LCD::LCD(string name, LOGGING &logging, TopicQueue &topicQueue, int sda, int scl
 //...............................................................................
 void LCD::start() {
   Module::start();
+  // Initialising the UI will init the display too.
+  display.init();
 
+  display.flipScreenVertically();
+  display.setFont(ArialMT_Plain_10);
+
+/*
   ssd1306_setFixedFont(ssd1306xled_font6x8);
   ssd1306_128x64_i2c_init();
   ssd1306_fillScreen( 0x00 );
   ssd1306_clearScreen();
+*/
 
 /*
   ssd1306_setFixedFont(ssd1306xled_font6x8);
@@ -76,11 +84,14 @@ String LCD::getVersion() {
 //...............................................................................
 void LCD::println(String txt, int yPos) {
 
+  display.setTextAlignment(TEXT_ALIGN_LEFT);
+  display.setFont(ArialMT_Plain_10);
+  display.drawString(0, yPos, txt);
 
 
 
 
-  ssd1306_printFixed(0,  yPos, txt.c_str(), STYLE_NORMAL);
+  //ssd1306_printFixed(0,  yPos, txt.c_str(), STYLE_NORMAL);
 
 
 
